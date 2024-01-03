@@ -4,7 +4,7 @@ import axios from "axios";
 import "./CurrencyConverter.css";
 
 const CurrencyConverter = () => {
-  const [rates, setRates] = useState(null || "");
+  const [rates, setRates] = useState(null);
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("EUR");
   const [amount, setAmount] = useState(1);
@@ -23,6 +23,20 @@ const CurrencyConverter = () => {
       });
   }, []);
 
+  useEffect(() => {
+    if (rates) {
+      const rateFrom = rates[fromCurrency || 0];
+      const rateTo = rates[toCurrency || 0];
+
+      // Fórmula para a conversão
+      setConvertedAmount(((amount / rateFrom) * rateTo).toFixed(2));
+    }
+  }, [amount, rates, fromCurrency, toCurrency]);
+
+  if (!rates) {
+    return <h2>Carregando...</h2>
+  }
+
   return (
     <div className="converter">
       <h2>Conversor de Moedas</h2>
@@ -33,7 +47,10 @@ const CurrencyConverter = () => {
         onChange={(e) => setAmount(e.target.value)}
       />
       <span>Selecione as moedas</span>
-      <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)}>
+      <select
+        value={fromCurrency}
+        onChange={(e) => setFromCurrency(e.target.value)}
+      >
         {Object.keys(rates).map((currency) => (
           <option value={currency} key={currency}>
             {currency}
@@ -41,7 +58,10 @@ const CurrencyConverter = () => {
         ))}
       </select>
       <span>para</span>
-      <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)}>
+      <select
+        value={toCurrency}
+        onChange={(e) => setToCurrency(e.target.value)}
+      >
         {Object.keys(rates).map((currency) => (
           <option value={currency} key={currency}>
             {currency}
